@@ -2,10 +2,6 @@ import os
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-# ══════════════════════════════════════════════════════════════════════════════════════
-# KONFIGURASI AWAL
-# ══════════════════════════════════════════════════════════════════════════════════════
-
 # Nama file teks yang digunakan untuk menyimpan seluruh riwayat transaksi
 nama_file = "riwayat_duid.txt"
 
@@ -24,7 +20,7 @@ output = {"Transfer", "Pembayaran"}
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# FUNGSI BACA & SIMPAN FILE
+# bagian read file
 # Bertanggung jawab atas semua operasi baca/tulis ke file teks
 # ══════════════════════════════════════════════════════════════════════════════════════
 
@@ -98,7 +94,7 @@ def tulis_ulang_semua(daftar: list):
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# FUNGSI TAMPILAN
+# tampilan user
 # Menangani semua output ke layar, termasuk tabel dan pagination
 # ══════════════════════════════════════════════════════════════════════════════════════
 
@@ -189,7 +185,7 @@ def cetak_pagination(data, judul=""):
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# FUNGSI VALIDASI INPUT
+# bagian validasi
 # Memastikan setiap input dari user sesuai dengan aturan yang berlaku
 # ══════════════════════════════════════════════════════════════════════════════════════
 
@@ -265,7 +261,7 @@ def konfirmasi(pesan="Simpan transaksi ini? (y/n): "):
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# FITUR UTAMA APLIKASI
+# fitur utama
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def tambah_transaksi():
@@ -348,7 +344,7 @@ def cek_saldo():
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# FITUR UPDATE TRANSAKSI
+# bagian update transaksi
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def update_transaksi():
@@ -559,7 +555,7 @@ def hapus_transaksi_lama():
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# MENU LAPORAN
+# bagian laporan transaksi
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def menu_laporan():
@@ -623,7 +619,7 @@ def menu_laporan():
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# MENU TAMPILAN RIWAYAT
+# bagian mutasi
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def menu_tampilan():
@@ -635,11 +631,11 @@ def menu_tampilan():
     4. Urutan Berdasarkan Nominal — dari yang terbesar ke terkecil.
     """
     while True:
-        print("\n=== TAMPILKAN RIWAYAT TRANSAKSI ===")
-        print("1. Tampilkan Semua Transaksi")
-        print("2. Tampilkan Transaksi Berdasarkan Jenis")
-        print("3. Tampilkan Urutan Berdasarkan Tanggal")
-        print("4. Tampilkan Urutan Berdasarkan Nominal")
+        print("\n=== Mutasi Rekening ===")
+        print("1. Tampilkan Semua Riwayat")
+        print("2. Tampilkan Riwayat Berdasarkan Jenis")
+        print("3. Tampilkan Riwayat Berdasarkan Tanggal")
+        print("4. Tampilkan Riwayat Berdasarkan Nominal")
         print("5. Kembali ke Menu Utama")
         pilih = input("Pilih opsi (1-5): ").strip()
         data  = baca_transaksi()
@@ -682,7 +678,7 @@ def menu_tampilan():
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# MENU UTAMA
+# menu utama user
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def main():
@@ -693,7 +689,7 @@ def main():
     while True:
         print("\n=== APLIKASI RIWAYAT KEUANGAN ===")
         print("1. Input Transaksi Baru")
-        print("2. Tampilkan Riwayat")
+        print("2. Mutasi Rekening")
         print("3. Cek Total Pengeluaran")
         print("4. Laporan")
         print("5. Update Transaksi")
