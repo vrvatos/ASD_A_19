@@ -712,7 +712,7 @@ def main():
             hapus_transaksi_lama()
         elif pilihan == '7':
             # Beritahu user bahwa data telah tersimpan sebelum program ditutup
-            print("Sistem Berhenti. Data Anda aman di 'riwayat_transaksi.txt'")
+            print("Sistem Berhenti. Data Anda aman di 'riwayat_duid.txt'")
             break
         else:
             print("Pilihan tidak valid. Masukkan angka 1-7.")
