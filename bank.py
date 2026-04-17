@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 
 # nama file pnyimpanan data transaksi
@@ -53,6 +53,16 @@ def simpan_transaksi(data: dict):
             f"{data['tanggal']},{data['nama']},{data['rek']},"
             f"{data['nominal']},{data['bank']},{data['jenis']}\n"
         )
+
+
+def tulis_ulang_semua(daftar: list):
+    """Timpa seluruh isi file dengan daftar transaksi yang diberikan."""
+    with open(nama_file, "w") as f:
+        for t in daftar:
+            f.write(
+                f"{t['tanggal']},{t['nama']},{t['rek']},"
+                f"{t['nominal']},{t['bank']},{t['jenis']}\n"
+            )
 
 
 # ═══════════════════════════════════════════
@@ -241,6 +251,188 @@ def cek_saldo():
 
 
 # ═══════════════════════════════════════════
+# UPDATE TRANSAKSI
+# ═══════════════════════════════════════════
+
+def update_transaksi():
+    """Edit data transaksi yang sudah ada berdasarkan nomor urut."""
+    print("\n=== UPDATE TRANSAKSI ===")
+    data = baca_transaksi()
+    if not data:
+        print("Belum ada transaksi.")
+        return
+
+    # tampilkan semua transaksi terlebih dahulu
+    cetak_pagination(data, "Pilih Transaksi yang Akan Diupdate")
+
+    # minta user memilih nomor transaksi
+    while True:
+        try:
+            pilih = input(f"\nMasukkan nomor transaksi yang ingin diupdate (1-{len(data)}, 0=Batal): ").strip()
+            idx = int(pilih)
+            if idx == 0:
+                print("  Update dibatalkan.")
+                return
+            if 1 <= idx <= len(data):
+                break
+            print(f"  Nomor harus antara 1 sampai {len(data)}.")
+        except ValueError:
+            print("  Masukkan angka yang valid.")
+
+    target = data[idx - 1]
+
+    # tampilkan data lama sebagai referensi
+    print("\n┌─── Data Lama ──────────────────────────────┐")
+    print(f"│  Nama    : {target['nama']}")
+    print(f"│  Rek     : {target['rek']}")
+    print(f"│  Bank    : {target['bank']}")
+    print(f"│  Nominal : Rp {int(float(target['nominal'])):,}")
+    print(f"│  Jenis   : {target['jenis']}")
+    print("└────────────────────────────────────────────┘")
+    print("  (Tekan Enter untuk mempertahankan nilai lama)\n")
+
+    # input data baru — tekan Enter untuk skip / pertahankan nilai lama
+    raw_nama = input(f"Nama pemilik rekening [{target['nama']}]: ").strip()
+    if raw_nama:
+        # validasi: tidak boleh ada angka
+        while any(c.isdigit() for c in raw_nama):
+            print("  Nama tidak boleh mengandung angka.")
+            raw_nama = input(f"Nama pemilik rekening [{target['nama']}]: ").strip()
+            if not raw_nama:
+                break
+        nama_baru = raw_nama if raw_nama else target['nama']
+    else:
+        nama_baru = target['nama']
+
+    raw_rek = input(f"Nomor rekening        [{target['rek']}]: ").strip()
+    if raw_rek:
+        while not (raw_rek.isdigit() and len(raw_rek) == 10):
+            print("  Nomor rekening harus tepat 10 digit angka.")
+            raw_rek = input(f"Nomor rekening        [{target['rek']}]: ").strip()
+            if not raw_rek:
+                break
+        rek_baru = raw_rek if raw_rek else target['rek']
+    else:
+        rek_baru = target['rek']
+
+    raw_bank = input(f"Nama bank             [{target['bank']}]: ").strip()
+    if raw_bank:
+        while any(c.isdigit() for c in raw_bank):
+            print("  Nama bank tidak boleh mengandung angka.")
+            raw_bank = input(f"Nama bank             [{target['bank']}]: ").strip()
+            if not raw_bank:
+                break
+        bank_baru = raw_bank if raw_bank else target['bank']
+    else:
+        bank_baru = target['bank']
+
+    raw_nominal = input(f"Nominal (Rp)          [{int(float(target['nominal'])):,}]: ").strip().replace(",", "").replace(".", "")
+    if raw_nominal:
+        while True:
+            try:
+                val = float(raw_nominal)
+                if val <= 0:
+                    print("  Nominal harus lebih dari 0.")
+                    raw_nominal = input(f"Nominal (Rp)          [{int(float(target['nominal'])):,}]: ").strip().replace(",", "").replace(".", "")
+                else:
+                    nominal_baru = str(int(val))
+                    break
+            except ValueError:
+                print("  Input tidak valid, masukkan angka saja.")
+                raw_nominal = input(f"Nominal (Rp)          [{int(float(target['nominal'])):,}]: ").strip().replace(",", "").replace(".", "")
+    else:
+        nominal_baru = target['nominal']
+
+    print(f"\nJenis Transaksi saat ini: {target['jenis']}")
+    print("  1. Transfer")
+    print("  2. Pembayaran")
+    raw_jenis = input("Pilih jenis baru (1-2, Enter=pertahankan): ").strip()
+    if raw_jenis in validitas:
+        jenis_baru = validitas[raw_jenis]
+    else:
+        jenis_baru = target['jenis']
+
+    # tampilkan ringkasan perubahan sebelum disimpan
+    print("\n┌─── Ringkasan Perubahan ────────────────────┐")
+    print(f"│  Nama    : {target['nama']:<18} → {nama_baru}")
+    print(f"│  Rek     : {target['rek']:<18} → {rek_baru}")
+    print(f"│  Bank    : {target['bank']:<18} → {bank_baru}")
+    print(f"│  Nominal : Rp {int(float(target['nominal'])):>10,}    → Rp {int(float(nominal_baru)):,}")
+    print(f"│  Jenis   : {target['jenis']:<18} → {jenis_baru}")
+    print("└────────────────────────────────────────────┘")
+
+    if not konfirmasi("Simpan perubahan ini? (y/n): "):
+        print("  Update dibatalkan.")
+        return
+
+    # terapkan perubahan — tanggal transaksi asli dipertahankan
+    data[idx - 1] = {
+        "tanggal": target['tanggal'],
+        "nama"   : nama_baru,
+        "rek"    : rek_baru,
+        "nominal": nominal_baru,
+        "bank"   : bank_baru,
+        "jenis"  : jenis_baru
+    }
+    tulis_ulang_semua(data)
+    print(f"\n✓ Transaksi nomor {idx} berhasil diupdate.")
+
+
+# ═══════════════════════════════════════════
+# HAPUS TRANSAKSI LAMA (> 2 BULAN)
+# ═══════════════════════════════════════════
+
+def hapus_transaksi_lama():
+    """
+    Hapus otomatis semua transaksi yang tanggalnya sudah lebih dari 2 bulan
+    (60 hari) dari hari ini. User akan melihat pratinjau sebelum konfirmasi.
+    """
+    print("\n=== HAPUS TRANSAKSI LEBIH DARI 2 BULAN ===")
+    data = baca_transaksi()
+    if not data:
+        print("Belum ada transaksi.")
+        return
+
+    batas = datetime.now() - timedelta(days=60)  # 60 hari ≈ 2 bulan
+
+    akan_dihapus = []
+    akan_disimpan = []
+
+    for t in data:
+        try:
+            tgl = datetime.strptime(t['tanggal'], "%Y-%m-%d %H:%M:%S")
+            if tgl < batas:
+                akan_dihapus.append(t)
+            else:
+                akan_disimpan.append(t)
+        except ValueError:
+            # jika format tanggal tidak dikenali, amankan dengan tetap simpan
+            akan_disimpan.append(t)
+
+    if not akan_dihapus:
+        print(f"  Tidak ada transaksi yang lebih dari 2 bulan (sebelum {batas.strftime('%Y-%m-%d')}).")
+        return
+
+    # tampilkan pratinjau transaksi yang akan dihapus
+    print(f"\n  Ditemukan {len(akan_dihapus)} transaksi sebelum {batas.strftime('%Y-%m-%d')} yang akan dihapus:\n")
+    cetak_header()
+    for i, t in enumerate(akan_dihapus, 1):
+        cetak_baris(i, t)
+
+    total_nominal = sum(float(t['nominal']) for t in akan_dihapus)
+    print(f"\n  Total nominal yang akan dihapus : Rp {total_nominal:,.0f}")
+    print(f"  Sisa transaksi setelah hapus    : {len(akan_disimpan)} transaksi\n")
+
+    if not konfirmasi(f"Hapus {len(akan_dihapus)} transaksi lama ini? (y/n): "):
+        print("  Penghapusan dibatalkan.")
+        return
+
+    tulis_ulang_semua(akan_disimpan)
+    print(f"\n✓ {len(akan_dihapus)} transaksi lama berhasil dihapus.")
+    print(f"  {len(akan_disimpan)} transaksi tersisa dalam riwayat.")
+
+
+# ═══════════════════════════════════════════
 # laporan
 # ═══════════════════════════════════════════
 
@@ -354,7 +546,9 @@ def main():
         print("2. Tampilkan Riwayat")
         print("3. Cek Total Pengeluaran")
         print("4. Laporan")
-        print("5. Keluar")
+        print("5. Update Transaksi")
+        print("6. Hapus Transaksi Lama (>2 Bulan)")
+        print("7. Keluar")
 
         pilihan = input("Pilih Menu: ").strip()
         if pilihan == '1':
@@ -366,10 +560,14 @@ def main():
         elif pilihan == '4':
             menu_laporan()
         elif pilihan == '5':
+            update_transaksi()
+        elif pilihan == '6':
+            hapus_transaksi_lama()
+        elif pilihan == '7':
             print("Sistem Berhenti. Data Anda aman di 'riwayat_transaksi.txt'")
             break
         else:
-            print("Pilihan tidak valid. Masukkan angka 1-5.")
+            print("Pilihan tidak valid. Masukkan angka 1-7.")
 
 
 if __name__ == "__main__":
