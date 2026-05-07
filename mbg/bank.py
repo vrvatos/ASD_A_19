@@ -468,7 +468,7 @@ def main():
         print(f"║  Saldo Anda : Rp {saldo:>17,.0f}   ║")
         print("╚══════════════════════════════════════╝")
         print("1. Transfer Bank")
-        print("2. Pembayaran Virtual Account")
+        print("2. Virtual Account")
         print("3. Mutasi Rekening")
         print("4. Cek Pemasukan & Pengeluaran")
         print("5. Laporan Keuangan (Bulanan)")
