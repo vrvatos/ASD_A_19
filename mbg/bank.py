@@ -2,6 +2,9 @@ import os
 import json
 from datetime import datetime, timedelta
 from collections import defaultdict
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 
 # Nama file JSON untuk menyimpan seluruh data aplikasi
 nama_file = "riwayat_duid.json"
@@ -458,6 +461,63 @@ def hapus_transaksi_lama():
 # ══════════════════════════════════════════════════════════════════════════════════════
 # utama
 # ══════════════════════════════════════════════════════════════════════════════════════
+def export_pdf():
+    transaksi = baca_transaksi()
+
+    if not transaksi:
+        print("Belum ada transaksi untuk diexport.")
+        return
+
+    nama_pdf = f"laporan_transaksi_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+
+    doc = SimpleDocTemplate(nama_pdf)
+    styles = getSampleStyleSheet()
+
+    elemen = []
+
+    judul = Paragraph("LAPORAN RIWAYAT TRANSAKSI", styles['Title'])
+    elemen.append(judul)
+    elemen.append(Spacer(1, 12))
+
+    data_tabel = [[
+        "Tanggal",
+        "Nama",
+        "Rek/VA",
+        "Nominal",
+        "Bank",
+        "Jenis"
+    ]]
+
+    for t in transaksi:
+        data_tabel.append([
+            t["tanggal"],
+            t["nama"],
+            t["rek"],
+            f"Rp {int(t['nominal']):,}",
+            t["bank"],
+            t["jenis"]
+        ])
+
+    tabel = Table(data_tabel)
+
+    tabel.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.grey),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+
+        ('GRID', (0,0), (-1,-1), 1, colors.black),
+
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige)
+    ]))
+
+    elemen.append(tabel)
+
+    doc.build(elemen)
+
+    print(f"\n✓ PDF berhasil dibuat:")
+    print(f"  {nama_pdf}")
+
 
 def main():
     while True:
@@ -473,7 +533,8 @@ def main():
         print("4. Cek Pemasukan & Pengeluaran")
         print("5. Laporan Keuangan (Bulanan)")
         print("6. Hapus Transaksi Lama (>2 Bulan)")
-        print("7. Keluar")
+        print("7. Export Riwayat ke PDF")
+        print("8. Keluar")
 
         pilihan = input("Pilih Menu: ").strip()
 
@@ -490,10 +551,12 @@ def main():
         elif pilihan == '6':
             hapus_transaksi_lama()
         elif pilihan == '7':
+            export_pdf()
+        elif pilihan == '8':
             print("Sistem Berhenti. Data Anda aman di 'riwayat_duid.json'")
             break
         else:
-            print("Pilihan tidak valid. Masukkan angka 1-7.")
+            print("Pilihan tidak valid. Masukkan angka 1-8.")
 
 if __name__ == "__main__":
     main()
