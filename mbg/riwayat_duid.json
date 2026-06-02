@@ -1,5 +1,13 @@
 {
-  "saldo": 0.0,
+  "saldo": 50000.0,
   "transaksi": [
+    {
+      "tanggal": "2026-06-02 22:09:35",
+      "nama": "Setor Tunai ATM",
+      "rek": "-",
+      "nominal": 50000,
+      "bank": "Cash",
+      "jenis": "Setor"
+    }
   ]
 }
