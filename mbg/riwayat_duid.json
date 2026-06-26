@@ -1,13 +1,29 @@
 {
-  "saldo": 50000.0,
+  "saldo": 1400000.0,
   "transaksi": [
     {
-      "tanggal": "2026-06-02 22:09:35",
+      "tanggal": "2026-06-26 09:21:07",
       "nama": "Setor Tunai ATM",
       "rek": "-",
-      "nominal": 50000,
+      "nominal": 1500000,
       "bank": "Cash",
       "jenis": "Setor"
+    },
+    {
+      "tanggal": "2026-06-26 15:33:20",
+      "nama": "Ironmen",
+      "rek": "1234567890",
+      "nominal": 50000,
+      "bank": "BCA",
+      "jenis": "Transfer Bank"
+    },
+    {
+      "tanggal": "2026-06-26 15:34:49",
+      "nama": "Gopay",
+      "rek": "081234567890",
+      "nominal": 50000,
+      "bank": "VA",
+      "jenis": "Virtual Account"
     }
   ]
 }

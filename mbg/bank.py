@@ -16,27 +16,25 @@ page = 10
 validitas = {
     "1": "Transfer Bank",
     "2": "Virtual Account",
-    "3": "Top Up",
-    "4": "Setor Tunai"
+    "3": "Setor Tunai"
 }
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# BAGIAN BANTUAN DETEKSI PEMASUKAN
+# validasi pemasukkan
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def is_pemasukan(t: dict) -> bool:
     """
-    Fungsi pintar untuk mendeteksi apakah transaksi adalah Pemasukan.
-    Jika ada kata 'setor', 'tunai', 'cash', atau 'top up' pada jenis atau bank, 
-    maka dianggap Pemasukan.
+    Fungsi untuk mendeteksi apakah transaksi adalah Pemasukan.
+    Jika ada kata berikut, maka dianggap Pemasukan.
     """
     teks_pencarian = (str(t.get('jenis', '')) + " " + str(t.get('bank', ''))).lower()
-    kata_kunci = ['top up', 'setor', 'tunai', 'cash', 'pemasukan', 'terima']
+    kata_kunci = ['setor', 'tunai', 'cash', 'pemasukan', 'terima']
     
     return any(kata in teks_pencarian for kata in kata_kunci)
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# rid n writ
+# read n write
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def baca_data() -> dict:
@@ -44,16 +42,12 @@ def baca_data() -> dict:
     if not os.path.exists(nama_file):
         return default
     with open(nama_file, "r") as f:
-        try:
-            data = json.load(f)
-            if "saldo" not in data:
-                data["saldo"] = 0.0
-            if "transaksi" not in data:
-                data["transaksi"] = []
-            return data
-        except json.JSONDecodeError:
-            print("  ⚠ File data rusak, membuat ulang data kosong.")
-            return default
+        data = json.load(f)
+        if "saldo" not in data:
+            data["saldo"] = 0.0
+        if "transaksi" not in data:
+            data["transaksi"] = []
+        return data
 
 def simpan_data(data: dict):
     with open(nama_file, "w") as f:
@@ -66,7 +60,7 @@ def baca_transaksi() -> list:
     return baca_data()["transaksi"]
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# client
+# Rincian Transaksi
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def cetak_header():
@@ -133,7 +127,7 @@ def cetak_pagination(data, judul=""):
             break
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# palisade
+# validasi transaksi
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def input_nama(label):
@@ -180,7 +174,7 @@ def konfirmasi(pesan="Simpan transaksi ini? (y/n): "):
         print("  Masukkan 'y' untuk Ya atau 'n' untuk Tidak.")
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# te ep dan top up
+# transfer
 # ══════════════════════════════════════════════════════════════════════════════════════
 
 def transfer_bank():
@@ -459,7 +453,7 @@ def hapus_transaksi_lama():
 
 
 # ══════════════════════════════════════════════════════════════════════════════════════
-# utama
+# menu utama
 # ══════════════════════════════════════════════════════════════════════════════════════
 def export_pdf():
     transaksi = baca_transaksi()
